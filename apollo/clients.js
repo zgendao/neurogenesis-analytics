@@ -12,13 +12,31 @@ exports.uniClient = new ApolloClient({
   shouldBatch: true,
 })
 
-exports.sushiClient = new ApolloClient({
+exports.shushiClient = new ApolloClient({
   link: new HttpLink({
-    uri: 'https://api.thegraph.com/subgraphs/name/sushiswap/sushiswap',
+    uri: 'https://api.thegraph.com/subgraphs/name/zippoxer/sushiswap-subgraph-fork',
     fetch: fetch,
   }),
   cache: new InMemoryCache(),
-  shouldBatch: true,
+  shouldBatch: true
+})
+
+exports.mdexClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://graph.mdex.cc/subgraphs/name/mdex/swap',
+    fetch: fetch,
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
+})
+
+exports.pancakeClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.thegraph.com/subgraphs/name/pancakeswap/exchange',
+    fetch: fetch,
+  }),
+  cache: new InMemoryCache(),
+  shouldBatch: true
 })
 
 exports.honeyClient = new ApolloClient({
@@ -41,6 +59,22 @@ exports.ethBlockClient = new ApolloClient({
 exports.xdaiBlockClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/1hive/xdai-blocks',
+    fetch: fetch,
+  }),
+  cache: new InMemoryCache()
+})
+
+exports.bscBlockClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://api.bscgraph.org/subgraphs/name/bsc-blocks',
+    fetch: fetch,
+  }),
+  cache: new InMemoryCache()
+})
+
+exports.hecoBlockClient = new ApolloClient({
+  link: new HttpLink({
+    uri: 'https://graph.mdex.cc/subgraphs/name/mdex-heco-blocks',
     fetch: fetch,
   }),
   cache: new InMemoryCache()

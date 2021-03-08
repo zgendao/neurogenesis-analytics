@@ -1,6 +1,7 @@
+const axios = require("axios")
+
 const { getBlockFromTimestamp, get2DayPercentChange, getPercentChange } = require('./utils.js')
 const { GLOBAL_DATA, GET_BLOCK, GLOBAL_CHART } = require('../apollo/queries.js')
-
 
 const dayjs = require('dayjs')
 const utc = require('dayjs/plugin/utc')
@@ -85,6 +86,7 @@ exports.getGlobalData = async function getGlobalData(protocolClient, blockClient
 
       // add relevant fields with the calculated amounts
       var globalData = {
+        totalLiquidity: parseFloat(data.totalLiquidityUSD),
         oneDayVolume,
         dailyVolumeChange,
         oneWeekVolume,
@@ -94,7 +96,8 @@ exports.getGlobalData = async function getGlobalData(protocolClient, blockClient
         oneWeekTxns,
         weeklyTxnChange,
         oneDayFee: oneDayVolume * 0.03,
-        oneWeekFee: oneWeekVolume * 0.03
+        oneWeekFee: oneWeekVolume * 0.03,
+        pairCount: data.pairCount
       }
     }
   } catch (e) {
@@ -103,7 +106,7 @@ exports.getGlobalData = async function getGlobalData(protocolClient, blockClient
   return globalData
 }
 
-exports.getChartData = async function getChartData(oldestDateToFetch, client) {
+exports.getChartData = async function getChartData(client, oldestDateToFetch) {
   let data = []
   let weeklyData = []
   const utcEndTime = dayjs.utc()
@@ -132,15 +135,21 @@ exports.getChartData = async function getChartData(oldestDateToFetch, client) {
       let dayIndexArray = []
       const oneDay = 24 * 60 * 60
 
+      var prevTxCount = parseInt(data[0].txCount)
+
       // for each day, parse the daily volume and format for chart array
       data.forEach((dayData, i) => {
+
         // add the day index to the set of days
         dayIndexSet.add((data[i].date / oneDay).toFixed(0))
         dayIndexArray.push(data[i])
         dayData.dailyVolumeUSD = parseFloat(dayData.dailyVolumeUSD)
         dayData.totalLiquidityUSD = parseFloat(dayData.totalLiquidityUSD)
-        dayData.txCount = parseInt(dayData.txCount)
         dayData.txFee = dayData.dailyVolumeUSD * 0.03
+
+        let txCount = parseInt(dayData.txCount)
+        dayData.txCount = txCount-prevTxCount
+        prevTxCount = txCount
       })
 
       // fill in empty days ( there will be no day datas if no trades made that day )
@@ -183,9 +192,31 @@ exports.getChartData = async function getChartData(oldestDateToFetch, client) {
         (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) + data[i].dailyVolumeUSD
       weeklyData[startIndexWeekly].weeklyAvgLiquidityUSD =
         (weeklyData[startIndexWeekly].weeklyAvgLiquidityUSD ?? 0) + (data[i].totalLiquidityUSD / 7)
+      weeklyData[startIndexWeekly].txCount =
+        (weeklyData[startIndexWeekly].txCount ?? 0) + data[i].txCount
     })
   } catch (e) {
     console.log(e)
   }
   return {dailyData: data, weeklyData}
+}
+
+exports.getGasPrice = async function getGasPrice(){
+  const gasPrices = {}
+  const apiKey = 'M4BRH3BDSA6DUPA3BSJX3D5276IAGTVJKQ'
+  const {data: {result: {SafeGasPrice: low, ProposeGasPrice: avg, FastGasPrice: high}}} =
+    await axios.get('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey='+apiKey)
+  const {data: {result: {ethusd}}} =
+    await axios.get('https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apiKey)
+
+  for (const [key, value] of Object.entries({low, avg, high})) {
+    const {data: {result: time}} =
+      await axios.get('https://api.etherscan.io/api?module=gastracker&action=gasestimate&gasprice='+value+'000000000&apikey='+apiKey)
+    gasPrices[key] = {}
+    gasPrices[key].gwei = parseInt(value)
+    gasPrices[key].time = parseInt(time)
+    gasPrices[key].price = parseInt(value) * 0.000000001 * 21000 * ethusd
+  }
+
+  return gasPrices
 }

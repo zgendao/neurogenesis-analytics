@@ -6,10 +6,7 @@ exports.GLOBAL_DATA = (block) => {
        {
         id
         totalVolumeUSD
-        totalVolumeETH
-        untrackedVolumeUSD
         totalLiquidityUSD
-        totalLiquidityETH
         txCount
         pairCount
       }
@@ -32,16 +29,15 @@ exports.GET_BLOCK = gql`
   }
 `
 
-exports.GLOBAL_CHART = gql`
+exports.GLOBAL_CHART =
+  gql`
   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
     uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
       totalVolumeUSD
       dailyVolumeUSD
-      dailyVolumeETH
       totalLiquidityUSD
-      totalLiquidityETH
       txCount
     }
   }
