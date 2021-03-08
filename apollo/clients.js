@@ -12,7 +12,7 @@ exports.uniClient = new ApolloClient({
   shouldBatch: true,
 })
 
-exports.shushiClient = new ApolloClient({
+exports.sushiClient = new ApolloClient({
   link: new HttpLink({
     uri: 'https://api.thegraph.com/subgraphs/name/zippoxer/sushiswap-subgraph-fork',
     fetch: fetch,

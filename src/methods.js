@@ -222,3 +222,12 @@ exports.getGasPrice = async function getGasPrice(){
 
   return gasPrices
 }
+
+exports.getPancakeMainData = async function getPancakeMainData() {
+  const {data} = await axios.get('https://api.pancakeswap.finance/api/v1/stat')
+  return {
+    oneDayVolume: data['24h_total_volume'],
+    oneDayFee: data['24h_total_volume'] * 0.03,
+    totalLiquidity: data.total_value_locked
+  }
+}

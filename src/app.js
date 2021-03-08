@@ -5,7 +5,7 @@ const port = 4444
 
 const {
   uniClient,
-  shushiClient,
+  sushiClient,
   mdexClient,
   pancakeClient,
   honeyClient,
@@ -15,22 +15,22 @@ const {
   xdaiBlockClient } = require('../apollo/clients.js')
 const { GLOBAL_DATA, GET_BLOCK } = require('../apollo/queries.js')
 const { getBlockFromTimestamp, get2DayPercentChange, getPercentChange } = require('./utils.js')
-const { getGlobalData, getChartData, getGasPrice } = require('./methods.js');
-
+const { getGlobalData, getChartData, getGasPrice, getPancakeMainData } = require('./methods.js');
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
 })
 
 async function getSummary(){
-  const [uni, sushi, mdex, honey] = await Promise.all([
+  const [uni, sushi, pancake, mdex, honey] = await Promise.all([
     getGlobalData(uniClient, ethBlockClient),
-    getGlobalData(shushiClient, ethBlockClient),
-    //getGlobalData(pancakeClient, bscBlockClient),
+    getGlobalData(sushiClient, ethBlockClient),
+    // getGlobalData(pancakeClient, bscBlockClient),
+    getPancakeMainData(),
     getGlobalData(mdexClient, hecoBlockClient),
     getGlobalData(honeyClient, xdaiBlockClient)
   ])
-  return {uni, sushi, mdex, honey}
+  return {uni, sushi, pancake, mdex, honey}
 }
 
 app.get("/api/summary", async (req, res) => {
@@ -41,11 +41,12 @@ app.get("/api/summary", async (req, res) => {
 async function getAggregatedChartData(oldestDateToFetch = 1593561600) { //JULY FIRST
   const [uni, sushi, pancake, mdex, honey] = await Promise.all([
     getChartData(uniClient, oldestDateToFetch),
-    getChartData(shushiClient, oldestDateToFetch),
+    getChartData(sushiClient, oldestDateToFetch),
     getChartData(pancakeClient, oldestDateToFetch),
     getChartData(mdexClient, oldestDateToFetch),
     getChartData(honeyClient, oldestDateToFetch)
   ])
+  return {uni, sushi, pancake, mdex, honey}
 }
 
 app.get("/api/chartData", (req, res) => {
@@ -55,3 +56,12 @@ app.get("/api/chartData", (req, res) => {
 app.get("/api/gasPrice", (req, res) => {
   getGasPrice().then(gasPrice => res.send(gasPrice))
 });
+
+async function run(){
+  console.time("MyTimer");
+  console.timeLog("MyTimer", "start");
+  const data = await getAggregatedChartData()
+  console.log(data);
+  console.timeLog("MyTimer", "end");
+}
+run()
