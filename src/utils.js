@@ -22,6 +22,37 @@ exports.getPercentChange = (valueNow, value24HoursAgo) => {
   return adjustedPercentChange
 }
 
+async function splitQuery(query, localClient, vars, list, skipCount = 100) {
+  let fetchedData = {}
+  let allFound = false
+  let skip = 0
+
+  while (!allFound) {
+    console.log(list);
+    let end = list.length
+    if (skip + skipCount < list.length) {
+      end = skip + skipCount
+    }
+    let sliced = list.slice(skip, end)
+    console.log(query(...vars, sliced));
+    let result = await localClient.query({
+      query: query(...vars, sliced),
+      fetchPolicy: 'cache-first',
+    })
+    fetchedData = {
+      ...fetchedData,
+      ...result.data,
+    }
+    if (Object.keys(result.data).length < skipCount || skip + skipCount > list.length) {
+      allFound = true
+    } else {
+      skip += skipCount
+    }
+  }
+
+  return fetchedData
+}
+
 exports.getBlockFromTimestamp = async function getBlockFromTimestamp(timestamp, client) {
   let result = await client.query({
     query: GET_BLOCK,

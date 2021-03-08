@@ -1,6 +1,6 @@
 const axios = require("axios")
 
-const { getBlockFromTimestamp, get2DayPercentChange, getPercentChange } = require('./utils.js')
+const { getBlockFromTimestamp, get2DayPercentChange, getPercentChange, getBlocksFromTimestamps } = require('./utils.js')
 const { GLOBAL_DATA, GET_BLOCK, GLOBAL_CHART } = require('../apollo/queries.js')
 
 const dayjs = require('dayjs')
@@ -22,42 +22,41 @@ exports.getGlobalData = async function getGlobalData(protocolClient, blockClient
     const utcOneWeekBack = utcCurrentTime.subtract(1, 'week').unix()
     const utcTwoWeeksBack = utcCurrentTime.subtract(2, 'week').unix()
 
-    const oneDayBlock = await getBlockFromTimestamp(utcOneDayBack, blockClient)
-    const twoDayBlock = await getBlockFromTimestamp(utcTwoDaysBack, blockClient)
-    const oneWeekBlock = await getBlockFromTimestamp(utcOneWeekBack, blockClient)
-    const twoWeekBlock = await getBlockFromTimestamp(utcTwoWeeksBack, blockClient)
+    const [oneDayBlock, twoDayBlock, oneWeekBlock, twoWeekBlock] = await Promise.all([
+      getBlockFromTimestamp(utcOneDayBack, blockClient),
+      getBlockFromTimestamp(utcTwoDaysBack, blockClient),
+      getBlockFromTimestamp(utcOneWeekBack, blockClient),
+      getBlockFromTimestamp(utcTwoWeeksBack, blockClient)
+    ])
 
-    // fetch the global data
-    let result = await protocolClient.query({
-      query: GLOBAL_DATA(),
-      fetchPolicy: 'cache-first',
-    })
-    data = result.data.uniswapFactories[0]
-
-    // fetch the historical data
-    let oneDayResult = await protocolClient.query({
-      query: GLOBAL_DATA(oneDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-    oneDayData = oneDayResult.data.uniswapFactories[0]
-
-    let twoDayResult = await protocolClient.query({
-      query: GLOBAL_DATA(twoDayBlock),
-      fetchPolicy: 'cache-first',
-    })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
-
-    let oneWeekResult = await protocolClient.query({
-      query: GLOBAL_DATA(oneWeekBlock),
-      fetchPolicy: 'cache-first',
-    })
-    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
-
-    let twoWeekResult = await protocolClient.query({
-      query: GLOBAL_DATA(twoWeekBlock),
-      fetchPolicy: 'cache-first',
-    })
-    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+    const [
+      {data: {uniswapFactories: [data]}},
+      {data: {uniswapFactories: [oneDayData]}},
+      {data: {uniswapFactories: [twoDayData]}},
+      {data: {uniswapFactories: [oneWeekData]}},
+      {data: {uniswapFactories: [twoWeekData]}},
+    ] = await Promise.all([
+      protocolClient.query({
+        query: GLOBAL_DATA(),
+        fetchPolicy: 'cache-first',
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(oneDayBlock),
+        fetchPolicy: 'cache-first',
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(twoDayBlock),
+        fetchPolicy: 'cache-first',
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(oneWeekBlock),
+        fetchPolicy: 'cache-first',
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(twoWeekBlock),
+        fetchPolicy: 'cache-first',
+      })
+    ])
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolume, dailyVolumeChange] = get2DayPercentChange(
@@ -204,10 +203,13 @@ exports.getChartData = async function getChartData(client, oldestDateToFetch) {
 exports.getGasPrice = async function getGasPrice(){
   const gasPrices = {}
   const apiKey = 'M4BRH3BDSA6DUPA3BSJX3D5276IAGTVJKQ'
-  const {data: {result: {SafeGasPrice: low, ProposeGasPrice: avg, FastGasPrice: high}}} =
-    await axios.get('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey='+apiKey)
-  const {data: {result: {ethusd}}} =
-    await axios.get('https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apiKey)
+  const [
+    {data: {result: {SafeGasPrice: low, ProposeGasPrice: avg, FastGasPrice: high}}},
+    {data: {result: {ethusd}}}
+  ] = await Promise.all([
+    axios.get('https://api.etherscan.io/api?module=gastracker&action=gasoracle&apikey='+apiKey),
+    axios.get('https://api.etherscan.io/api?module=stats&action=ethprice&apikey='+apiKey)
+  ])
 
   for (const [key, value] of Object.entries({low, avg, high})) {
     const {data: {result: time}} =

@@ -35,7 +35,6 @@ exports.GLOBAL_CHART =
     uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
       id
       date
-      totalVolumeUSD
       dailyVolumeUSD
       totalLiquidityUSD
       txCount
