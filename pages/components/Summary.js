@@ -49,7 +49,7 @@ function DataCard({ title, amount, change, loading }) {
         {title}
       </Heading>
       <Flex justifyContent="space-between">
-        <Skeleton isLoaded={!loading} w="50%">
+        <Skeleton isLoaded={!loading} minWidth="50%">
           <Text fontSize="2xl" fontWeight="bold">
             ${amount}
           </Text>
