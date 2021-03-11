@@ -1,22 +1,32 @@
 {
-  "name": "neurogenesis-dex-tools",
-  "version": "1.0.0",
-  "main": "app.js",
-  "license": "MIT",
+  "name": "neurogenesis-analytic-next",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "start": "node src/app.js",
-    "dev": "nodemon src/app.js"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
   "dependencies": {
+    "@chakra-ui/react": "^1.3.4",
+    "@emotion/react": "^11.1.5",
+    "@emotion/styled": "^11.1.5",
     "apollo-cache-inmemory": "^1.6.6",
     "apollo-client": "^2.6.10",
     "apollo-link-http": "^1.5.17",
     "axios": "^0.21.1",
+    "chart.js": "^3.0.0-beta.11",
+    "chartjs-adapter-dayjs": "^1.0.0",
+    "chartjs-plugin-zoom": "^0.7.7",
+    "chartjs-react": "^3.1.9",
     "dayjs": "^1.10.4",
-    "express": "^4.17.1",
+    "focus-visible": "^5.2.0",
+    "framer-motion": "^3.10.2",
     "graphql": "^15.5.0",
     "graphql-tag": "^2.11.0",
-    "lowdb": "^1.0.0",
-    "node-fetch": "^2.6.1"
+    "next": "10.0.8",
+    "node-fetch": "^2.6.1",
+    "react": "17.0.1",
+    "react-dom": "17.0.1"
   }
 }

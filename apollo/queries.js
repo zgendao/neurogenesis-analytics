@@ -1,6 +1,6 @@
-const gql = require('graphql-tag')
+const gql = require("graphql-tag");
 
-exports.GLOBAL_DATA = (block) => {
+export const GLOBAL_DATA = (block) => {
   const queryString = ` query uniswapFactories {
       uniswapFactories${block ? `(block: { number: ${block}})` : ``}
        {
@@ -10,11 +10,11 @@ exports.GLOBAL_DATA = (block) => {
         txCount
         pairCount
       }
-    }`
-  return gql(queryString)
-}
+    }`;
+  return gql(queryString);
+};
 
-exports.GET_BLOCK = gql`
+export const GET_BLOCK = gql`
   query blocks($timestampFrom: Int!, $timestampTo: Int!) {
     blocks(
       first: 1
@@ -27,12 +27,17 @@ exports.GET_BLOCK = gql`
       timestamp
     }
   }
-`
+`;
 
-exports.GLOBAL_CHART =
-  gql`
+export const GLOBAL_CHART = gql`
   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
-    uniswapDayDatas(first: 1000, skip: $skip, where: { date_gt: $startTime }, orderBy: date, orderDirection: asc) {
+    uniswapDayDatas(
+      first: 1000
+      skip: $skip
+      where: { date_gt: $startTime }
+      orderBy: date
+      orderDirection: asc
+    ) {
       id
       date
       dailyVolumeUSD
@@ -40,4 +45,4 @@ exports.GLOBAL_CHART =
       txCount
     }
   }
-`
+`;
