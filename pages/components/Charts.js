@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@chakra-ui/button";
 import { ButtonGroup } from "@chakra-ui/button";
 import { registerables } from "chart.js";
@@ -18,6 +18,8 @@ const ReactChart = dynamic(
 import useFetch from "../../hooks/useFetch";
 import { CircularProgress } from "@chakra-ui/progress";
 import { Flex } from "@chakra-ui/layout";
+import { DexesContext } from "../../providers/dexes";
+import { filterObj } from "../../utils/filterObj";
 
 const charts = [
   {
@@ -44,14 +46,6 @@ const charts = [
 ];
 
 const aggregationUnits = ["daily", "weekly"];
-
-const dexes = [
-  { label: "UniSwap", key: "uni", color: "rgb(255, 0, 122)" },
-  { label: "SushiSwap", key: "sushi", color: "blue" },
-  { label: "PancakeSwap", key: "pancake", color: "brown" },
-  { label: "Mdex", key: "mdex", color: "red" },
-  { label: "HoneySwap", key: "honey", color: "yellow" },
-];
 
 const chartOptions = {
   plugins: {
@@ -82,26 +76,34 @@ const chartOptions = {
 
 export default function Charts() {
   const { response, loading, error } = useFetch("api/chartData");
+  const { dexes } = useContext(DexesContext);
 
+  const [selectedDexes, setSelectedDexes] = useState(dexes);
   const [selectedView, setSelectedView] = useState(0);
   const [selectedUnit, setSelectedUnit] = useState(0);
   const [chartData, setChartData] = useState({});
 
   useEffect(() => {
+    setSelectedDexes(filterObj(dexes, (k, v) => v.active));
+  }, [dexes]);
+
+  useEffect(() => {
     if (!response) return;
     setChartData({
-      datasets: dexes.map(({ label, key, color }) => ({
-        label,
-        data: response[key][aggregationUnits[selectedUnit] + "Data"],
-        borderColor: color,
-        parsing: {
-          xAxisKey: "date",
-          yAxisKey:
-            charts[selectedView].yAxisKey[aggregationUnits[selectedUnit]],
-        },
-      })),
+      datasets: Object.entries(selectedDexes).map(
+        ([key, { label, color }]) => ({
+          label,
+          data: response[key][aggregationUnits[selectedUnit] + "Data"],
+          borderColor: color,
+          parsing: {
+            xAxisKey: "date",
+            yAxisKey:
+              charts[selectedView].yAxisKey[aggregationUnits[selectedUnit]],
+          },
+        })
+      ),
     });
-  }, [response, selectedUnit, selectedView]);
+  }, [response, selectedUnit, selectedView, dexes]);
 
   return (
     <>
