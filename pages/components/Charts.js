@@ -20,9 +20,30 @@ import { CircularProgress } from "@chakra-ui/progress";
 import { Flex } from "@chakra-ui/layout";
 
 const charts = [
-  { name: "Volume", yAxisKey: "dailyVolumeUSD" },
-  { name: "Liquidity", yAxisKey: "totalLiquidityUSD" },
+  {
+    name: "Volume",
+    yAxisKey: {
+      daily: "dailyVolumeUSD",
+      weekly: "weeklyVolumeUSD",
+    },
+  },
+  {
+    name: "Liquidity",
+    yAxisKey: {
+      daily: "totalLiquidityUSD",
+      weekly: "weeklyAvgLiquidityUSD",
+    },
+  },
+  {
+    name: "Fees",
+    yAxisKey: {
+      daily: "txFee",
+      weekly: "txFee",
+    },
+  },
 ];
+
+const aggregationUnits = ["daily", "weekly"];
 
 const dexes = [
   { label: "UniSwap", key: "uni", color: "rgb(255, 0, 122)" },
@@ -63,7 +84,7 @@ export default function Charts() {
   const { response, loading, error } = useFetch("api/chartData");
 
   const [selectedView, setSelectedView] = useState(0);
-  const [selectedUnit, setSelectedUnit] = useState("daily");
+  const [selectedUnit, setSelectedUnit] = useState(0);
   const [chartData, setChartData] = useState({});
 
   useEffect(() => {
@@ -71,11 +92,12 @@ export default function Charts() {
     setChartData({
       datasets: dexes.map(({ label, key, color }) => ({
         label,
-        data: response[key][selectedUnit + "Data"],
+        data: response[key][aggregationUnits[selectedUnit] + "Data"],
         borderColor: color,
         parsing: {
           xAxisKey: "date",
-          yAxisKey: charts[selectedView].yAxisKey,
+          yAxisKey:
+            charts[selectedView].yAxisKey[aggregationUnits[selectedUnit]],
         },
       })),
     });
@@ -83,17 +105,30 @@ export default function Charts() {
 
   return (
     <>
-      <ButtonGroup spacing={2} pb={8}>
-        {charts.map(({ name }, i) => (
-          <Button
-            key={i}
-            bg={selectedView === i ? "gray.300" : ""}
-            onClick={() => setSelectedView(i)}
-          >
-            {name}
-          </Button>
-        ))}
-      </ButtonGroup>
+      <Flex justifyContent="space-between">
+        <ButtonGroup spacing={2} pb={8}>
+          {charts.map(({ name }, i) => (
+            <Button
+              key={i}
+              bg={selectedView === i ? "gray.300" : ""}
+              onClick={() => setSelectedView(i)}
+            >
+              {name}
+            </Button>
+          ))}
+        </ButtonGroup>
+        <ButtonGroup spacing={2} pb={8}>
+          {aggregationUnits.map((unit, i) => (
+            <Button
+              key={i}
+              bg={selectedUnit === i ? "gray.300" : ""}
+              onClick={() => setSelectedUnit(i)}
+            >
+              {unit}
+            </Button>
+          ))}
+        </ButtonGroup>
+      </Flex>
       {loading ? (
         <Flex
           w="100%"

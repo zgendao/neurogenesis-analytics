@@ -119,6 +119,8 @@ async function getChartData(client, oldestDateToFetch) {
         data[i].totalLiquidityUSD / 7;
       weeklyData[startIndexWeekly].txCount =
         (weeklyData[startIndexWeekly].txCount ?? 0) + data[i].txCount;
+      weeklyData[startIndexWeekly].txFee =
+        (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) * 0.03;
     });
   } catch (e) {
     console.log(e);
