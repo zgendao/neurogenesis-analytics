@@ -1,4 +1,4 @@
-import {
+const {
   uniClient,
   sushiClient,
   mdexClient,
@@ -6,20 +6,26 @@ import {
   ethBlockClient,
   hecoBlockClient,
   xdaiBlockClient,
-} from "../../apollo/clients.js";
-import { GLOBAL_DATA, GET_BLOCK } from "../../apollo/queries.js";
-import axios from "axios";
+} = require("../../apollo/clients.js");
+const { GLOBAL_DATA, GET_BLOCK } = require("../../apollo/queries.js");
+const axios = require("axios");
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import weekOfYear from "dayjs/plugin/weekOfYear";
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const weekOfYear = require("dayjs/plugin/weekOfYear");
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
 
-export default async (req, res) => {
+/* export default (req, res) => {
+  const a = {};
+
+  res.status(200).json(a);
+}; */
+
+setInterval(async () => {
   const sum = await getSummary();
-  res.status(200).json(sum);
-};
+  console.log(sum);
+}, 2000);
 
 async function getSummary() {
   const [uni, sushi, pancake, mdex, honey] = await Promise.all([
@@ -108,26 +114,26 @@ async function getGlobalData(protocolClient, blockClient) {
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolume, dailyVolumeChange] = get2DayPercentChange(
         data.totalVolumeUSD,
-        oneDayData.totalVolumeUSD ? oneDayData.totalVolumeUSD : 0,
-        twoDayData.totalVolumeUSD ? twoDayData.totalVolumeUSD : 0
+        oneDayData.totalVolumeUSD,
+        twoDayData.totalVolumeUSD
       );
 
       const [oneWeekVolume, weeklyVolumeChange] = get2DayPercentChange(
         data.totalVolumeUSD,
-        oneWeekData.totalVolumeUSD ? oneWeekData.totalVolumeUSD : 0,
-        twoWeekData.totalVolumeUSD ? twoWeekData.totalVolumeUSD : 0
+        oneWeekData.totalVolumeUSD,
+        twoWeekData.totalVolumeUSD
       );
 
       const [oneDayTxns, dailyTxnChange] = get2DayPercentChange(
         data.txCount,
-        oneDayData.txCount ? oneDayData.txCount : 0,
-        twoDayData.txCount ? twoDayData.txCount : 0
+        oneDayData.txCount,
+        twoDayData.txCount
       );
 
       const [oneWeekTxns, weeklyTxnChange] = get2DayPercentChange(
         data.txCount,
-        oneWeekData.txCount ? oneWeekData.txCount : 0,
-        twoWeekData.txCount ? twoWeekData.txCount : 0
+        oneWeekData.txCount,
+        twoWeekData.txCount
       );
 
       // add relevant fields with the calculated amounts

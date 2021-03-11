@@ -1,10 +1,10 @@
-import axios from "axios";
-
+const axios = require("axios");
+/* 
 export default async (req, res) => {
   const data = await getGasPrice();
   res.status(200).json(data);
 };
-
+ */
 async function getGasPrice() {
   const gasPrices = {};
   const apiKey = "M4BRH3BDSA6DUPA3BSJX3D5276IAGTVJKQ";

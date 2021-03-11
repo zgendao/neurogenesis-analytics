@@ -1,6 +1,6 @@
 const gql = require("graphql-tag");
 
-export const GLOBAL_DATA = (block) => {
+exports.GLOBAL_DATA = (block) => {
   const queryString = ` query uniswapFactories {
       uniswapFactories${block ? `(block: { number: ${block}})` : ``}
        {
@@ -14,7 +14,7 @@ export const GLOBAL_DATA = (block) => {
   return gql(queryString);
 };
 
-export const GET_BLOCK = gql`
+exports.GET_BLOCK = gql`
   query blocks($timestampFrom: Int!, $timestampTo: Int!) {
     blocks(
       first: 1
@@ -29,7 +29,7 @@ export const GET_BLOCK = gql`
   }
 `;
 
-export const GLOBAL_CHART = gql`
+exports.GLOBAL_CHART = gql`
   query uniswapDayDatas($startTime: Int!, $skip: Int!) {
     uniswapDayDatas(
       first: 1000

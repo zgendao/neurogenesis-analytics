@@ -1,23 +1,23 @@
-import {
+const {
   uniClient,
   sushiClient,
   mdexClient,
   pancakeClient,
   honeyClient,
-} from "../../apollo/clients.js";
-import { GLOBAL_CHART } from "../../apollo/queries.js";
+} = require("../../apollo/clients.js");
+const { GLOBAL_CHART } = require("../../apollo/queries.js");
 
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import weekOfYear from "dayjs/plugin/weekOfYear";
+const dayjs = require("dayjs");
+const utc = require("dayjs/plugin/utc");
+const weekOfYear = require("dayjs/plugin/weekOfYear");
 dayjs.extend(utc);
 dayjs.extend(weekOfYear);
-
+/* 
 export default async (req, res) => {
   const data = await getAggregatedChartData();
   res.status(200).json(data);
 };
-
+ */
 async function getAggregatedChartData(oldestDateToFetch = 1593561600) {
   //JULY FIRST
   const [uni, sushi, pancake, mdex, honey] = await Promise.all([
