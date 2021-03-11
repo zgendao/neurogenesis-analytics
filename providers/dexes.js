@@ -9,6 +9,7 @@ const DexesProvider = ({ children }) => {
     pancake: { label: "PancakeSwap", color: "brown", active: true },
     mdex: { label: "Mdex", color: "red", active: true },
     honey: { label: "HoneySwap", color: "yellow", active: true },
+    total: { label: "Total", color: "green", active: true },
   });
 
   const toggleDex = (key) => {
