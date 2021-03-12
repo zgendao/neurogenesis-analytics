@@ -49,7 +49,7 @@ export default function Summary() {
   );
 }
 
-function DataCard({ title, amount, change, loading }) {
+function DataCard({ title, amount = "?", change, loading }) {
   return (
     <Box>
       <Heading as="h5" pb={3} size="sm" fontWeight="medium">
