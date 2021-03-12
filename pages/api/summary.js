@@ -56,54 +56,85 @@ async function getGlobalData(protocolClient, blockClient) {
       getBlockFromTimestamp(utcTwoWeeksBack, blockClient),
     ]);
 
-    const [
-      {
-        data: {
-          uniswapFactories: [data],
-        },
-      },
-      {
-        data: {
-          uniswapFactories: [oneDayData],
-        },
-      },
-      {
-        data: {
-          uniswapFactories: [twoDayData],
-        },
-      },
-      {
-        data: {
-          uniswapFactories: [oneWeekData],
-        },
-      },
-      {
-        data: {
-          uniswapFactories: [twoWeekData],
-        },
-      },
-    ] = await Promise.all([
-      protocolClient.query({
-        query: GLOBAL_DATA(),
-        fetchPolicy: "cache-first",
-      }),
-      protocolClient.query({
-        query: GLOBAL_DATA(oneDayBlock),
-        fetchPolicy: "cache-first",
-      }),
-      protocolClient.query({
-        query: GLOBAL_DATA(twoDayBlock),
-        fetchPolicy: "cache-first",
-      }),
-      protocolClient.query({
-        query: GLOBAL_DATA(oneWeekBlock),
-        fetchPolicy: "cache-first",
-      }),
-      protocolClient.query({
-        query: GLOBAL_DATA(twoWeekBlock),
-        fetchPolicy: "cache-first",
-      }),
-    ]);
+    // const [
+    //   {
+    //     data: {
+    //       uniswapFactories: [data],
+    //     },
+    //   },
+    //   {
+    //     data: {
+    //       uniswapFactories: [oneDayData],
+    //     },
+    //   },
+    //   {
+    //     data: {
+    //       uniswapFactories: [twoDayData],
+    //     },
+    //   },
+    //   {
+    //     data: {
+    //       uniswapFactories: [oneWeekData],
+    //     },
+    //   },
+    //   {
+    //     data: {
+    //       uniswapFactories: [twoWeekData],
+    //     },
+    //   },
+    // ] = await Promise.all([
+    //   protocolClient.query({
+    //     query: GLOBAL_DATA(),
+    //     fetchPolicy: "cache-first",
+    //   }),
+    //   protocolClient.query({
+    //     query: GLOBAL_DATA(oneDayBlock),
+    //     fetchPolicy: "cache-first",
+    //   }),
+    //   protocolClient.query({
+    //     query: GLOBAL_DATA(twoDayBlock),
+    //     fetchPolicy: "cache-first",
+    //   }),
+    //   protocolClient.query({
+    //     query: GLOBAL_DATA(oneWeekBlock),
+    //     fetchPolicy: "cache-first",
+    //   }),
+    //   protocolClient.query({
+    //     query: GLOBAL_DATA(twoWeekBlock),
+    //     fetchPolicy: "cache-first",
+    //   }),
+    // ]);
+
+    let result = await protocolClient.query({
+      query: GLOBAL_DATA(),
+      fetchPolicy: 'cache-first',
+    })
+    data = result.data.uniswapFactories[0]
+
+    // fetch the historical data
+    let oneDayResult = await protocolClient.query({
+      query: GLOBAL_DATA(oneDayBlock?.number),
+      fetchPolicy: 'cache-first',
+    })
+    oneDayData = oneDayResult.data.uniswapFactories[0]
+
+    let twoDayResult = await protocolClient.query({
+      query: GLOBAL_DATA(twoDayBlock?.number),
+      fetchPolicy: 'cache-first',
+    })
+    twoDayData = twoDayResult.data.uniswapFactories[0]
+
+    let oneWeekResult = await protocolClient.query({
+      query: GLOBAL_DATA(oneWeekBlock?.number),
+      fetchPolicy: 'cache-first',
+    })
+    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
+
+    let twoWeekResult = await protocolClient.query({
+      query: GLOBAL_DATA(twoWeekBlock?.number),
+      fetchPolicy: 'cache-first',
+    })
+    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolume, dailyVolumeChange] = get2DayPercentChange(
