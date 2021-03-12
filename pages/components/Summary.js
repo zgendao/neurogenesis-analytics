@@ -15,7 +15,10 @@ const sumData = (obj, key, dexes) => {
   const selectedDexesObj = filterObj(obj, (k, v) => dexes[k].active);
   return Object.values(selectedDexesObj)
     .reduce((res, cexObj) => res + cexObj[key], 0)
-    .toFixed(2);
+    .toLocaleString("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
 };
 
 export default function Summary() {
@@ -55,7 +58,7 @@ function DataCard({ title, amount, change, loading }) {
       <Flex justifyContent="space-between">
         <Skeleton isLoaded={!loading} minWidth="50%">
           <Text fontSize="2xl" fontWeight="bold">
-            ${amount}
+            {amount}
           </Text>
         </Skeleton>
         {/* {change ? <Text fontSize="sm">{change} %</Text> : null} */}

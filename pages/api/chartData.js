@@ -20,36 +20,58 @@ export default async (req, res) => {
 
 function reduceMetric(exchanges, metric, date, interval) {
   return Object.entries(exchanges).reduce((acc, current) => {
-    return acc + (current[1].[interval].find(el => el.date == date)?.[metric] || 0)
-  }, 0)
+    return (
+      acc + (current[1][interval].find((el) => el.date == date)?.[metric] || 0)
+    );
+  }, 0);
 }
 
 function getTotal(exchanges) {
-  var dailyData = []
-  for (var {date} of exchanges.uni.dailyData) {
-    const dailyVolumeUSD = reduceMetric(exchanges, 'dailyVolumeUSD', date, 'dailyData')
+  var dailyData = [];
+  for (var { date } of exchanges.uni.dailyData) {
+    const dailyVolumeUSD = reduceMetric(
+      exchanges,
+      "dailyVolumeUSD",
+      date,
+      "dailyData"
+    );
     dailyData.push({
       date,
       dailyVolumeUSD,
-      totalLiquidityUSD: reduceMetric(exchanges, 'totalLiquidityUSD', date, 'dailyData'),
-      txCount: reduceMetric(exchanges, 'txCount', date, 'dailyData'),
-      txFee: dailyVolumeUSD * 0.03
-    })
+      totalLiquidityUSD: reduceMetric(
+        exchanges,
+        "totalLiquidityUSD",
+        date,
+        "dailyData"
+      ),
+      txCount: reduceMetric(exchanges, "txCount", date, "dailyData"),
+      txFee: dailyVolumeUSD * 0.03,
+    });
   }
 
-  var weeklyData = []
-  for (var {date} of exchanges.uni.weeklyData) {
-    const weeklyVolumeUSD = reduceMetric(exchanges, 'weeklyVolumeUSD', date, 'weeklyData')
+  var weeklyData = [];
+  for (var { date } of exchanges.uni.weeklyData) {
+    const weeklyVolumeUSD = reduceMetric(
+      exchanges,
+      "weeklyVolumeUSD",
+      date,
+      "weeklyData"
+    );
     weeklyData.push({
       date,
       weeklyVolumeUSD,
-      weeklyAvgLiquidityUSD: reduceMetric(exchanges, 'weeklyAvgLiquidityUSD', date, 'weeklyData'),
-      txCount: reduceMetric(exchanges, 'txCount', date, 'weeklyData'),
-      txFee: weeklyVolumeUSD * 0.03
-    })
+      weeklyAvgLiquidityUSD: reduceMetric(
+        exchanges,
+        "weeklyAvgLiquidityUSD",
+        date,
+        "weeklyData"
+      ),
+      txCount: reduceMetric(exchanges, "txCount", date, "weeklyData"),
+      txFee: weeklyVolumeUSD * 0.03,
+    });
   }
 
-  return {dailyData, weeklyData}
+  return { dailyData, weeklyData };
 }
 
 async function getAggregatedChartData(oldestDateToFetch = 1593561600) {
@@ -62,7 +84,7 @@ async function getAggregatedChartData(oldestDateToFetch = 1593561600) {
     getChartData(honeyClient, oldestDateToFetch),
   ]);
 
-  const total = getTotal({ uni, sushi, pancake, mdex, honey })
+  const total = getTotal({ uni, sushi, pancake, mdex, honey });
   return { uni, sushi, pancake, mdex, honey, total };
 }
 

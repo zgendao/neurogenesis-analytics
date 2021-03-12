@@ -28,7 +28,10 @@ function FeeCard({ title, color, gwei = "???", time, price, loading }) {
         {title}
       </Heading>
       <Skeleton isLoaded={!loading} px={5}>
-        <Text fontSize="2xl" fontWeight="bold" sx={{ color: `${color}.400` }}>
+        <Text
+          fontSize="2xl"
+          fontWeight="bold" /* sx={{ color: `${color}.400` }} */
+        >
           {gwei}
         </Text>
       </Skeleton>

@@ -4,12 +4,12 @@ const DexesContext = createContext();
 
 const DexesProvider = ({ children }) => {
   const [dexes, setDexes] = useState({
-    uni: { label: "UniSwap", color: "rgb(255, 0, 122)", active: true },
-    sushi: { label: "SushiSwap", color: "blue", active: true },
-    pancake: { label: "PancakeSwap", color: "brown", active: true },
-    mdex: { label: "Mdex", color: "red", active: true },
-    honey: { label: "HoneySwap", color: "yellow", active: true },
-    total: { label: "Total", color: "green", active: true },
+    total: { label: "Total", active: true },
+    uni: { label: "UniSwap", active: true },
+    sushi: { label: "SushiSwap", active: true },
+    pancake: { label: "PancakeSwap", active: true },
+    mdex: { label: "Mdex", active: true },
+    honey: { label: "HoneySwap", active: true },
   });
 
   const toggleDex = (key) => {
