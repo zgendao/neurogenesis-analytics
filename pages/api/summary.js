@@ -22,14 +22,83 @@ export default async (req, res) => {
 };
 
 async function getSummary() {
-  const [uni, sushi, pancake, mdex, honey] = await Promise.all([
+  /* const [uni, sushi, pancake, mdex, honey] = await Promise.all([
     getGlobalData(uniClient, ethBlockClient),
     getGlobalData(sushiClient, ethBlockClient),
     getPancakeMainData(),
     getGlobalData(mdexClient, hecoBlockClient),
     getGlobalData(honeyClient, xdaiBlockClient),
-  ]);
-  return { uni, sushi, pancake, mdex, honey };
+  ]); */
+  const data = {
+    uni: {
+      totalLiquidity: 4696465669.780892,
+      oneDayVolume: 1157467917.1260529,
+      dailyVolumeChange: 28.767827358020483,
+      oneWeekVolume: 7099636866.570435,
+      weeklyVolumeChange: 17.894267080037615,
+      oneDayTxns: 169309,
+      dailyTxnChange: 6.837083685651906,
+      oneWeekTxns: 1158084,
+      weeklyTxnChange: 17.801243638634784,
+      oneDayFee: 34724037.513781585,
+      oneWeekFee: 212989105.99711302,
+      pairCount: 30815,
+    },
+    sushi: {
+      totalLiquidity: 4072477191.832629,
+      oneDayVolume: 297567653.2150955,
+      dailyVolumeChange: 13.641229182975101,
+      oneWeekVolume: 2151727445.8943176,
+      weeklyVolumeChange: -25.986201704355683,
+      oneDayTxns: 11984,
+      dailyTxnChange: 10.288974783729063,
+      oneWeekTxns: 89878,
+      weeklyTxnChange: -22.844879388788737,
+      oneDayFee: 8927029.596452866,
+      oneWeekFee: 64551823.37682953,
+      pairCount: 814,
+    },
+    pancake: {
+      oneDayVolume: 1974124930.5912623,
+      oneDayFee: 59223747.91773787,
+      totalLiquidity: 2855003899.7511406,
+      dailyVolumeChange: 0,
+    },
+    mdex: {
+      totalLiquidity: 1911571209.9980254,
+      oneDayVolume: 2056542492.12352,
+      dailyVolumeChange: -6.985050244166477,
+      oneWeekVolume: 16510064362.227554,
+      weeklyVolumeChange: -18.68838226217828,
+      oneDayTxns: 850604,
+      dailyTxnChange: -8.150944455662469,
+      oneWeekTxns: 7411676,
+      weeklyTxnChange: -20.354718539087802,
+      oneDayFee: 61696274.7637056,
+      oneWeekFee: 495301930.8668266,
+      pairCount: 2938,
+    },
+    honey: {
+      totalLiquidity: 10289257.687802982,
+      oneDayVolume: 19941569.36917062,
+      dailyVolumeChange: 706.5249499695356,
+      oneWeekVolume: 39933658.15462533,
+      weeklyVolumeChange: 57.846654020947,
+      oneDayTxns: 58215,
+      dailyTxnChange: 174.4954734062618,
+      oneWeekTxns: 208976,
+      weeklyTxnChange: 23.019685410191205,
+      oneDayFee: 598247.0810751186,
+      oneWeekFee: 1198009.7446387596,
+      pairCount: 875,
+    },
+  };
+  function wait(milliseconds) {
+    return new Promise((resolve) => setTimeout(resolve, milliseconds));
+  }
+  //return { uni, sushi, pancake, mdex, honey };
+  await wait(2000);
+  return data;
 }
 
 async function getGlobalData(protocolClient, blockClient) {
@@ -56,85 +125,54 @@ async function getGlobalData(protocolClient, blockClient) {
       getBlockFromTimestamp(utcTwoWeeksBack, blockClient),
     ]);
 
-    // const [
-    //   {
-    //     data: {
-    //       uniswapFactories: [data],
-    //     },
-    //   },
-    //   {
-    //     data: {
-    //       uniswapFactories: [oneDayData],
-    //     },
-    //   },
-    //   {
-    //     data: {
-    //       uniswapFactories: [twoDayData],
-    //     },
-    //   },
-    //   {
-    //     data: {
-    //       uniswapFactories: [oneWeekData],
-    //     },
-    //   },
-    //   {
-    //     data: {
-    //       uniswapFactories: [twoWeekData],
-    //     },
-    //   },
-    // ] = await Promise.all([
-    //   protocolClient.query({
-    //     query: GLOBAL_DATA(),
-    //     fetchPolicy: "cache-first",
-    //   }),
-    //   protocolClient.query({
-    //     query: GLOBAL_DATA(oneDayBlock),
-    //     fetchPolicy: "cache-first",
-    //   }),
-    //   protocolClient.query({
-    //     query: GLOBAL_DATA(twoDayBlock),
-    //     fetchPolicy: "cache-first",
-    //   }),
-    //   protocolClient.query({
-    //     query: GLOBAL_DATA(oneWeekBlock),
-    //     fetchPolicy: "cache-first",
-    //   }),
-    //   protocolClient.query({
-    //     query: GLOBAL_DATA(twoWeekBlock),
-    //     fetchPolicy: "cache-first",
-    //   }),
-    // ]);
-
-    let result = await protocolClient.query({
-      query: GLOBAL_DATA(),
-      fetchPolicy: 'cache-first',
-    })
-    data = result.data.uniswapFactories[0]
-
-    // fetch the historical data
-    let oneDayResult = await protocolClient.query({
-      query: GLOBAL_DATA(oneDayBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    oneDayData = oneDayResult.data.uniswapFactories[0]
-
-    let twoDayResult = await protocolClient.query({
-      query: GLOBAL_DATA(twoDayBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    twoDayData = twoDayResult.data.uniswapFactories[0]
-
-    let oneWeekResult = await protocolClient.query({
-      query: GLOBAL_DATA(oneWeekBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    const oneWeekData = oneWeekResult.data.uniswapFactories[0]
-
-    let twoWeekResult = await protocolClient.query({
-      query: GLOBAL_DATA(twoWeekBlock?.number),
-      fetchPolicy: 'cache-first',
-    })
-    const twoWeekData = twoWeekResult.data.uniswapFactories[0]
+    const [
+      {
+        data: {
+          uniswapFactories: [data],
+        },
+      },
+      {
+        data: {
+          uniswapFactories: [oneDayData],
+        },
+      },
+      {
+        data: {
+          uniswapFactories: [twoDayData],
+        },
+      },
+      {
+        data: {
+          uniswapFactories: [oneWeekData],
+        },
+      },
+      {
+        data: {
+          uniswapFactories: [twoWeekData],
+        },
+      },
+    ] = await Promise.all([
+      protocolClient.query({
+        query: GLOBAL_DATA(),
+        fetchPolicy: "cache-first",
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(oneDayBlock),
+        fetchPolicy: "cache-first",
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(twoDayBlock),
+        fetchPolicy: "cache-first",
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(oneWeekBlock),
+        fetchPolicy: "cache-first",
+      }),
+      protocolClient.query({
+        query: GLOBAL_DATA(twoWeekBlock),
+        fetchPolicy: "cache-first",
+      }),
+    ]);
 
     if (data && oneDayData && twoDayData && twoWeekData) {
       let [oneDayVolume, dailyVolumeChange] = get2DayPercentChange(
