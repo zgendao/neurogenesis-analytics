@@ -41,8 +41,8 @@ const charts = [
   {
     name: "Transactions",
     yAxisKey: {
-      daily: "txCount",
-      weekly: "txCount",
+      daily: "txDiff",
+      weekly: "txDiff",
     },
   },
 ];

@@ -84,8 +84,8 @@ async function getAggregatedChartData(oldestDateToFetch = 1593561600) {
     getChartData(honeyClient, oldestDateToFetch),
   ]);
 
-  const total = getTotal({ uni, sushi, pancake, mdex, honey });
-  return { uni, sushi, pancake, mdex, honey, total };
+  const total = getTotal({uni, sushi, pancake, mdex, honey});
+  return {uni, sushi, pancake, mdex, honey, total};
 }
 
 async function getChartData(client, oldestDateToFetch) {
@@ -116,7 +116,6 @@ async function getChartData(client, oldestDateToFetch) {
       let dayIndexSet = new Set();
       let dayIndexArray = [];
       const oneDay = 24 * 60 * 60;
-
       var prevTxCount = parseInt(data[0].txCount);
 
       // for each day, parse the daily volume and format for chart array
@@ -128,9 +127,9 @@ async function getChartData(client, oldestDateToFetch) {
         dayData.totalLiquidityUSD = parseFloat(dayData.totalLiquidityUSD);
         dayData.txFee = dayData.dailyVolumeUSD * 0.03;
 
-        let txCount = parseInt(dayData.txCount);
-        dayData.txCount = txCount - prevTxCount;
-        prevTxCount = txCount;
+        var currentTxCount = parseInt(dayData.txCount);
+        dayData.txDiff = currentTxCount - prevTxCount;
+        prevTxCount = parseInt(dayData.txCount);
       });
 
       // fill in empty days ( there will be no day datas if no trades made that day )
@@ -175,8 +174,8 @@ async function getChartData(client, oldestDateToFetch) {
       weeklyData[startIndexWeekly].weeklyAvgLiquidityUSD =
         (weeklyData[startIndexWeekly].weeklyAvgLiquidityUSD ?? 0) +
         data[i].totalLiquidityUSD / 7;
-      weeklyData[startIndexWeekly].txCount =
-        (weeklyData[startIndexWeekly].txCount ?? 0) + data[i].txCount;
+      weeklyData[startIndexWeekly].txDiff =
+        (weeklyData[startIndexWeekly].txDiff ?? 0) + data[i].txDiff;
       weeklyData[startIndexWeekly].txFee =
         (weeklyData[startIndexWeekly].weeklyVolumeUSD ?? 0) * 0.03;
     });
